@@ -30,14 +30,17 @@ print b
 conn_str = u'oracle/beer4Admin@TEST1'
 conn = cx_Oracle.connect(conn_str, mode=cx_Oracle.SYSDBA)
 c = conn.cursor()
+# get size of Fixed Area
 c.execute(u'select value from v$sga where name like \'Fixed%\'')
 for row in c:
     shmem_size = row[0]
 
+# select base address of SGA start
 c.execute(u'select \'0x\'||to_number(addr) from sys.x$ksmmem where rownum=1')
 for row in c:
     shmem_ksmem = int(row[0], 16)
 
+# select address of table
 c.execute(u'select \'0x\'||addr from sys.x$ksuse where rownum=1')
 for row in c:
     shmem_ksuse = int(row[0], 16)

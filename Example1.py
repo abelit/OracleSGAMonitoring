@@ -3,7 +3,7 @@
 
 from ctypes import *
 
-shmid     = 131074
+shmid     = 655367
 sgaBase   = 0x50000000
 ksuseAddr = 0x5B2B1680
 rowCount  = 170
