@@ -3,17 +3,26 @@
 
 from ctypes import *
 
-shmid     = 655367
-sgaBase   = 0x50000000
-ksuseAddr = 0x5B2B1680
-rowCount  = 170
-rowSize   = 2408
+"""
+IPC Resources for ORACLE_SID "test1" :
+Shared Memory:
+ID		KEY
+589827  	0x00000000
+622598  	0x00000000
+655367  	0xaa5ccb7c
+"""
+
+shmid     = 622598
+sgaBase   = 0x60000000
+ksuseAddr = 0xC28B1360
+rowCount  = 247
+rowSize   = 0x30E0
 
 class SGAException(Exception):
   pass
 
 class ReadSGA:
-  libc = cdll.LoadLibrary("/lib/libc.so.6")
+  libc = cdll.LoadLibrary("/lib64/libc.so.6")
   def __init__(self,shmid,sgaBase):
     self.mem = self.libc.shmat(shmid,sgaBase,010000) # 010000 == SHM_RDONLY
     if self.mem == -1:
@@ -57,13 +66,15 @@ print "---------- ---------- ------------------------------ --------"
 
 memaddr = ksuseAddr
 for i in range(1,rowCount):
-  ksspaflg = readSGA.read1(memaddr+1)
-  ksuseflg = readSGA.read4(memaddr+1388)
+  ksspaflg = readSGA.read1(memaddr+0)
+  #ksuseflg = readSGA.read4(memaddr+5936)
   sid      = i
-  serial   = readSGA.read2(memaddr+1382)
-  username = readSGA.reads(memaddr+67,30)
-  statusid = readSGA.read1(memaddr+1420)
-  status   = readstatus(statusid,ksuseflg)
-  if (ksspaflg & 1 != 0) and (ksuseflg & 1 != 0):
-    print "%10d %10d %-30s %-8s" % (sid,serial,username,status)
-  memaddr += rowSize
+  serial   = readSGA.read2(memaddr+5922)
+  username = readSGA.reads(memaddr+163,30)
+  statusid = readSGA.read1(memaddr+5976)
+  #status   = readstatus(statusid,ksuseflg)
+  #if (ksspaflg & 1 != 0) and (ksuseflg & 1 != 0):
+  #  print "%10d %10d %-30s %-8s" % (sid,serial,username,status)
+print "%10d %10d %-30s" (sid, serial, username)
+
+memaddr += rowSize
