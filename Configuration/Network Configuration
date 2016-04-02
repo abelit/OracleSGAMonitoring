@@ -1,0 +1,18 @@
+VirtualBox Lab 
+******Host**************************
+1 Vboxnet0 - 192.168.66.1
+
+******VMs***************************
+Oracle base:
+1 Adapter (Host Only) - 192.168.66.2      Enp0s3 - VBOXNetwork		
+2 Adapter (Internal)  - 192.168.1.2 ---   Enp0s8 - Local
+3 Adapter (NAT)                        |  Enp0s9 - Nat
+------------------------------------   |
+Enterprise Manager:                    |
+1 Adapter (Host Only) - 192.168.66.3   |  Eth3-VBOXNetwork
+2 Adapter (Internal)  - 192.168.1.3 ---   Eth4-Local
+------------------------------------
+Win7
+1. Nat
+2. Host-Only Adapter - 192.168.66.6
+------------------------------------
