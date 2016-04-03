@@ -1,0 +1,142 @@
+GV$SESSION
+
+?
+select
+  s.inst_id,                               -- INST_ID NUMBER
+  s.addr,                                  -- SADDR RAW(8)
+  s.indx,                                  -- SID NUMBER
+  s.ksuseser,                              -- SERIAL# NUMBER
+  s.ksuudses,                              -- AUDSID NUMBER
+  s.ksusepro,                              -- PADDR RAW(8)
+  s.ksuudlui,                              -- USER# NUMBER
+  s.ksuudlna,                              -- USERNAME VARCHAR2(30)
+  s.ksuudoct,                              -- COMMAND NUMBER
+  s.ksusesow,                              -- OWNERID NUMBER
+  decode(                                  -- TADDR VARCHAR2(16)
+    s.ksusetrn,hextoraw('00'),null,s.ksusetrn),
+  decode(                                  -- LOCKWAIT VARCHAR2(16)
+    s.ksqpswat,hextoraw('00'),null,s.ksqpswat),
+  decode(                                  -- STATUS VARCHAR2(8)
+    bitand(s.ksuseidl,11),1,'ACTIVE',0,decode(bitand(s.ksuseflg,4096),0,'INACTIVE','CACHED'),2,'SNIPED',3,'SNIPED', 'KILLED'),
+  decode(                                  -- SERVER VARCHAR2(9)
+    s.ksspatyp,1,'DEDICATED',2,'SHARED',3,'PSEUDO',4,'POOLED','NONE'),
+  s.ksuudsid,                              -- SCHEMA# NUMBER
+  s.ksuudsna,                              -- SCHEMANAME VARCHAR2(30)
+  s.ksuseunm,                              -- OSUSER VARCHAR2(30)
+  s.ksusepid,                              -- PROCESS VARCHAR2(24)
+  s.ksusemnm,                              -- MACHINE VARCHAR2(64)
+  s.ksusemnp,                              -- PORT NUMBER
+  s.ksusetid,                              -- TERMINAL VARCHAR2(16)
+  s.ksusepnm,                              -- PROGRAM VARCHAR2(64)
+  decode(                                  -- TYPE VARCHAR2(10)
+    bitand(s.ksuseflg,19),17,'BACKGROUND',1,'USER',2,'RECURSIVE','?'),
+  s.ksusesql,                              -- SQL_ADDRESS RAW(8)
+  s.ksusesqh,                              -- SQL_HASH_VALUE NUMBER
+  s.ksusesqi,                              -- SQL_ID VARCHAR2(13)
+  decode(                                  -- SQL_CHILD_NUMBER NUMBER
+    s.ksusesch, 65535, to_number(null), s.ksusesch),
+  s.ksusesesta,                            -- SQL_EXEC_START DATE
+  decode(                                  -- SQL_EXEC_ID NUMBER
+    s.ksuseseid, 0, to_number(null), s.ksuseseid),
+  s.ksusepsq,                              -- PREV_SQL_ADDR RAW(8)
+  s.ksusepha,                              -- PREV_HASH_VALUE NUMBER
+  s.ksusepsi,                              -- PREV_SQL_ID VARCHAR2(13)
+  decode(                                  -- PREV_CHILD_NUMBER NUMBER
+    s.ksusepch, 65535, to_number(null), s.ksusepch),
+  s.ksusepesta,                            -- PREV_EXEC_START DATE
+  decode(                                  -- PREV_EXEC_ID NUMBER
+    s.ksusepeid, 0, to_number(null), s.ksusepeid),
+  decode(                                  -- PLSQL_ENTRY_OBJECT_ID NUMBER
+    s.ksusepeo,0,to_number(null),s.ksusepeo),
+  decode(                                  -- PLSQL_ENTRY_SUBPROGRAM_ID NUMBER
+    s.ksusepeo,0,to_number(null),s.ksusepes),
+  decode(                                  -- PLSQL_OBJECT_ID NUMBER
+    s.ksusepco,0,to_number(null), decode(bitand(s.ksusstmbv, power(2,11)), power(2,11), s.ksusepco, to_number(null))),
+  decode(                                  -- PLSQL_SUBPROGRAM_ID NUMBER
+    s.ksusepcs,0,to_number(null), decode(bitand(s.ksusstmbv, power(2,11)), power(2,11), s.ksusepcs, to_number(null))),
+  s.ksuseapp,                              -- MODULE VARCHAR2(48)
+  s.ksuseaph,                              -- MODULE_HASH NUMBER
+  s.ksuseact,                              -- ACTION VARCHAR2(32)
+  s.ksuseach,                              -- ACTION_HASH NUMBER
+  s.ksusecli,                              -- CLIENT_INFO VARCHAR2(64)
+  s.ksusefix,                              -- FIXED_TABLE_SEQUENCE NUMBER
+  s.ksuseobj,                              -- ROW_WAIT_OBJ# NUMBER
+  s.ksusefil,                              -- ROW_WAIT_FILE# NUMBER
+  s.ksuseblk,                              -- ROW_WAIT_BLOCK# NUMBER
+  s.ksuseslt,                              -- ROW_WAIT_ROW# NUMBER
+  s.ksuseorafn,                            -- TOP_LEVEL_CALL# NUMBER
+  s.ksuseltm,                              -- LOGON_TIME DATE
+  s.ksusectm,                              -- LAST_CALL_ET NUMBER
+  decode(                                  -- PDML_ENABLED VARCHAR2(3)
+    bitand(s.ksusepxopt, 12),0,'NO','YES'),
+  decode(                                  -- FAILOVER_TYPE VARCHAR2(13)
+    s.ksuseft, 2,'SESSION', 4,'SELECT',8,'TRANSACTIONAL','NONE'),
+  decode(                                  -- FAILOVER_METHOD VARCHAR2(10)
+    s.ksusefm,1,'BASIC',2,'PRECONNECT',4,'PREPARSE','NONE'),
+  decode(                                  -- FAILED_OVER VARCHAR2(3)
+    s.ksusefs, 1, 'YES', 'NO'),
+  s.ksusegrp,                              -- RESOURCE_CONSUMER_GROUP VARCHAR2(32)
+  decode(                                  -- PDML_STATUS VARCHAR2(8)
+    bitand(s.ksusepxopt,4),4,'ENABLED',decode(bitand(s.ksusepxopt,8),8,'FORCED','DISABLED')),
+  decode(                                  -- PDDL_STATUS VARCHAR2(8)
+    bitand(s.ksusepxopt,2),2,'FORCED',decode(bitand(s.ksusepxopt,1),1,'DISABLED','ENABLED')),
+  decode(                                  -- PQ_STATUS VARCHAR2(8)
+    bitand(s.ksusepxopt,32),32,'FORCED',decode(bitand(s.ksusepxopt,16),16,'DISABLED','ENABLED')),
+  s.ksusecqd,                              -- CURRENT_QUEUE_DURATION NUMBER
+  s.ksuseclid,                             -- CLIENT_IDENTIFIER VARCHAR2(64)
+  decode(                                  -- BLOCKING_SESSION_STATUS VARCHAR2(11)
+    s.ksuseblocker,4294967295,'UNKNOWN', 4294967294, 'UNKNOWN',4294967293,'UNKNOWN',4294967292,'NO HOLDER', 4294967291,'NOT IN WAIT','VALID'),
+  decode(                                  -- BLOCKING_INSTANCE NUMBER
+    s.ksuseblocker, 4294967295,to_number(null),4294967294,to_number(null), 4294967293,to_number(null), 4294967292,to_number(null),4294967291, to_number(null),bitand(s.ksuseblocker, 2147418112)/65536),
+  decode(                                  -- BLOCKING_SESSION NUMBER
+    s.ksuseblocker, 4294967295,to_number(null),4294967294,to_number(null), 4294967293,to_number(null), 4294967292,to_number(null),4294967291, to_number(null),bitand(s.ksuseblocker, 65535)),
+  decode(                                  -- FINAL_BLOCKING_SESSION_STATUS VARCHAR2(11)
+    s.ksusefblocker,4294967295,'UNKNOWN', 4294967294, 'UNKNOWN',4294967293,'UNKNOWN',4294967292,'NO HOLDER', 4294967291,'NOT IN WAIT','VALID'),
+  decode(                                  -- FINAL_BLOCKING_INSTANCE NUMBER
+    s.ksusefblocker,4294967295,to_number(null),4294967294,to_number(null), 4294967293,to_number(null), 4294967292,to_number(null),4294967291, to_number(null),bitand(s.ksusefblocker, 2147418112)/65536),
+  decode(                                  -- FINAL_BLOCKING_SESSION NUMBER
+    s.ksusefblocker,4294967295,to_number(null),4294967294,to_number(null), 4294967293,to_number(null), 4294967292,to_number(null),4294967291, to_number(null),bitand(s.ksusefblocker, 65535)),
+  w.kslwtseq,                              -- SEQ# NUMBER
+  w.kslwtevt,                              -- EVENT# NUMBER
+  e.kslednam,                              -- EVENT VARCHAR2(64)
+  e.ksledp1,                               -- P1TEXT VARCHAR2(64)
+  w.kslwtp1,                               -- P1 NUMBER
+  w.kslwtp1r,                              -- P1RAW RAW(8)
+  e.ksledp2,                               -- P2TEXT VARCHAR2(64)
+  w.kslwtp2,                               -- P2 NUMBER
+  w.kslwtp2r,                              -- P2RAW RAW(8)
+  e.ksledp3,                               -- P3TEXT VARCHAR2(64)
+  w.kslwtp3,                               -- P3 NUMBER
+  w.kslwtp3r,                              -- P3RAW RAW(8)
+  e.ksledclassid,                          -- WAIT_CLASS_ID NUMBER
+  e.ksledclass#,                           -- WAIT_CLASS# NUMBER
+  e.ksledclass,                            -- WAIT_CLASS VARCHAR2(64)
+  decode(                                  -- WAIT_TIME NUMBER
+    w.kslwtinwait, 0,decode(bitand(w.kslwtflags,256), 0,-2, decode(round(w.kslwtstime/10000), 0,-1, round(w.kslwtstime/10000))), 0),
+  decode(                                  -- SECONDS_IN_WAIT NUMBER
+    w.kslwtinwait,0,round((w.kslwtstime+w.kslwtltime)/1000000), round(w.kslwtstime/1000000)),
+  decode(                                  -- STATE VARCHAR2(19)
+    w.kslwtinwait,1,'WAITING', decode(bitand(w.kslwtflags,256),0,'WAITED UNKNOWN TIME', decode(round(w.kslwtstime/10000),0,'WAITED SHORT TIME', 'WAITED KNOWN TIME'))),
+  w.kslwtstime,                            -- WAIT_TIME_MICRO NUMBER
+  decode(                                  -- TIME_REMAINING_MICRO NUMBER
+    w.kslwtinwait,0,to_number(null), decode(bitand(w.kslwtflags,64),64,0,w.kslwttrem)),
+  w.kslwtltime,                            -- TIME_SINCE_LAST_WAIT_MICRO NUMBER
+  s.ksusesvc,                              -- SERVICE_NAME VARCHAR2(64)
+  decode(                                  -- SQL_TRACE VARCHAR2(8)
+    bitand(s.ksuseflg2,32),32,'ENABLED','DISABLED'),
+  decode(                                  -- SQL_TRACE_WAITS VARCHAR2(5)
+    bitand(s.ksuseflg2,64),64,'TRUE','FALSE'),
+  decode(                                  -- SQL_TRACE_BINDS VARCHAR2(5)
+    bitand(s.ksuseflg2,128),128,'TRUE','FALSE'),
+  decode(                                  -- SQL_TRACE_PLAN_STATS VARCHAR2(10)
+    bitand(s.ksuseflg2,65536) + bitand(s.ksuseflg2,131072),65536,'ALL EXEC',131072,'NEVER',0,'FIRST EXEC'),
+  s.ksuudsae,                              -- SESSION_EDITION_ID NUMBER
+  s.ksusecre,                              -- CREATOR_ADDR RAW(8)
+  s.ksusecsn,                              -- CREATOR_SERIAL# NUMBER
+  s.ksuseecid                              -- ECID VARCHAR2(64)
+from
+  x$ksuse s,
+  x$ksled e,
+  x$kslwt w
+where
+  bitand(s.ksspaflg,1)!=0 and bitand(s.ksuseflg,1)!=0 and s.indx=w.kslwtsid and w.kslwtevt=e.indx
