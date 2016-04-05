@@ -7,14 +7,15 @@ from ctypes import *
 IPC Resources for ORACLE_SID "test1" :
 Shared Memory:
 ID		KEY
-589827  	0x00000000
-622598  	0x00000000
-655367  	0xaa5ccb7c
+18481156	0x00000000
+18513925	0x00000000
+18546694	0xaa5ccb7c
+
 """
 
-shmid     = 622598
+shmid     = 18513925
 sgaBase   = 0x60000000
-ksuseAddr = 0xC28B1360
+ksuseAddr = 0x9A034020
 rowCount  = 247
 rowSize   = 0x30E0
 
@@ -74,9 +75,9 @@ for i in range(1,rowCount):
   username = readSGA.reads(memaddr+163,30)
   statusid = readSGA.read1(memaddr+5976)
   status   = readstatus(statusid,ksuseflg)
-  if (ksspaflg & 1 != 0) and (ksuseflg & 1 != 0):
-    print "%10d %10d %-30s %-8s" % (sid,serial,username,status)
-print "%10d %10d %-30s" (sid, serial, username)
+  #if (ksspaflg & 1 != 0) and (ksuseflg & 1 != 0):
+  print "%10d %10d %-30s %-8s" % (sid,serial,username,status)
+
 
 # OriginalDefenitions Oracle 10g
 """
