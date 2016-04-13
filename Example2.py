@@ -11,13 +11,15 @@ ID		KEY
 18513925	0x00000000
 18546694	0xaa5ccb7c
 
+18481156
+000000009A034020
 """
 
-shmid     = 18513925
-sgaBase   = 0x60000000
+shmid     = 851973
+sgaBase   = 0x60c00000
 ksuseAddr = 0x9A034020
 rowCount  = 247
-rowSize   = 0x30E0
+rowSize   = 12512
 
 class SGAException(Exception):
   pass
@@ -62,8 +64,8 @@ def readstatus(statusid,ksuseflg):
 readSGA = ReadSGA(shmid,sgaBase)
 
 print "'select from v$session' made by reading SGA directly:"
-print "       SID    SERIAL# USERNAME                       STATUS"
-print "---------- ---------- ------------------------------ --------"
+print "       SID    SERIAL#    USERNAME     MACHINENAME                                                                       STATUS"
+print "---------- ---------- -------------- -------------------------------------------------------------------------------- --------"
 
 # MyDefenitions Oracle 11g
 memaddr = ksuseAddr
@@ -72,12 +74,13 @@ for i in range(1,rowCount):
   ksuseflg = readSGA.read4(memaddr+5936)
   sid      = i
   serial   = readSGA.read2(memaddr+5922)
-  username = readSGA.reads(memaddr+163,30)
+  username = readSGA.reads(memaddr+6200,30)
+  machinename = readSGA.reads(memaddr+6240,64)
   statusid = readSGA.read1(memaddr+5976)
   status   = readstatus(statusid,ksuseflg)
-  #if (ksspaflg & 1 != 0) and (ksuseflg & 1 != 0):
-  print "%10d %10d %-30s %-8s" % (sid,serial,username,status)
-
+  if (ksspaflg & 1 != 0) and (ksuseflg & 1 != 0):
+    print "%10d %10d %-30s %-64s %-8s" % (sid,serial,username,machinename,status)
+  memaddr += rowSize
 
 # OriginalDefenitions Oracle 10g
 """
@@ -94,4 +97,4 @@ for i in range(1,rowCount):
     print "%10d %10d %-30s %-8s" % (sid,serial,username,status)
 """
 
-memaddr += rowSize
+
