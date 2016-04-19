@@ -14,7 +14,7 @@ port = 1521
 sid = 'test1'
 dsn = cx_Oracle.makedsn(host, port, sid)
 
-conn = cx_Oracle.Connection('sys','beer4Admin', dsn, mode = cx_Oracle.SYSDBA)
+conn = cx_Oracle.Connection('/', mode = cx_Oracle.SYSDBA)
 c = conn.cursor()
 #c.execute(u'SELECT view_name FROM ALL_VIEWS')
 c.execute(u'SELECT RAWTONHEX(min(addr)) FROM X$KSUSE')
