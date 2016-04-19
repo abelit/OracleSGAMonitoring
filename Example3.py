@@ -2,7 +2,27 @@
 # readSGA.py
 
 from ctypes import *
+import cx_Oracle
 
+### Experiments
+
+# Oracle connect
+#conn_str = u'oracle/beer4Admin@TEST1'
+#conn = cx_Oracle.connect(conn_str)
+host = 'localhost'
+port = 1521
+sid = 'test1'
+dsn = cx_Oracle.makedsn(host, port, sid)
+
+conn = cx_Oracle.Connection('sys','beer4Admin', dsn, mode = cx_Oracle.SYSDBA)
+c = conn.cursor()
+#c.execute(u'SELECT view_name FROM ALL_VIEWS')
+c.execute(u'SELECT RAWTONHEX(min(addr)) FROM X$KSUSE')
+for row in c:
+  print row[0]
+conn.close()
+
+###
 """
 IPC Resources for ORACLE_SID "test1" :
 Shared Memory:
@@ -14,12 +34,23 @@ ID		KEY
 18481156
 000000009A034020
 """
-
+# PMAP
 shmid     = 851973
 sgaBase   = 0x60c00000
+
+# SQL SELECT
 ksuseAddr = 0x9A034020
 rowCount  = 247
 rowSize   = 12512
+
+# SQL OFFSET FOR IDENTIFICATORS
+#  ksspaflg = readSGA.read4(memaddr+0)
+#  ksuseflg = readSGA.read4(memaddr + 5936)
+#  serial = readSGA.read2(memaddr + 5922)
+#  username = readSGA.reads(memaddr + 6200, 30)
+#  machinename = readSGA.reads(memaddr + 6240, 64)
+#  statusid = readSGA.read1(memaddr + 5976)
+
 
 class SGAException(Exception):
   pass
@@ -90,21 +121,20 @@ for i in range(1,rowCount):
 # Close opend file
 fo.close()
 
-# Backup
-"""
-memaddr = ksuseAddr
-for i in range(1,rowCount):
-  ksspaflg = readSGA.read4(memaddr+0)
-  ksuseflg = readSGA.read4(memaddr+5936)
-  sid      = i
-  serial   = readSGA.read2(memaddr+5922)
-  username = readSGA.reads(memaddr+6200,30)
-  machinename = readSGA.reads(memaddr+6240,64)
-  statusid = readSGA.read1(memaddr+5976)
-  status   = readstatus(statusid,ksuseflg)
-  if (ksspaflg & 1 != 0) and (ksuseflg & 1 != 0) and (serial != 30795):
-    print "%10d %10d %-30s %-64s %-8s" % (sid,serial,username,machinename,status)
-  memaddr += rowSize
-"""
 
 
+
+
+"""
+Use SQL as PMAP in python:
+
+import os
+from subprocess import Popen, PIPE
+
+sqlplus = Popen(["sqlplus", "-S", "/", "as", "sysdba"], stdout=PIPE, stdin=PIPE)
+sqlplus.stdin.write("select sysdate from dual;"+os.linesep)
+sqlplus.stdin.write("select count(*) from all_objects;"+os.linesep)
+out, err = sqlplus.communicate()
+print out
+
+"""
