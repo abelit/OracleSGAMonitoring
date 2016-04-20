@@ -26,19 +26,13 @@ sqlSgaBase = "SELECT RAWTOHEX(addr) FROM sys.x$ksmmem WHERE rownum=1"
 cur.execute(u'SELECT RAWTONHEX(min(addr)) FROM X$KSUSE')
 for row in cur:
   ksuseAddrSQL = row[0]
-  print "ksuseAddrSQL:", ksuseAddrSQL
+  ksuseAddrHEX = hex(int(ksuseAddrSQL, 16))
+  print "ksuseAddrHEX:", ksuseAddrHEX
 
 cur.execute(sqlSgaBase)
 sgaBaseSQL = cur.fetchone()
-print "sgaBaseS:", sgaBaseSQL[0].decode("utf-8")
-
-#To HEX
-ksuseAddrHEX = hex(int(ksuseAddrSQL,16))
-print "ksuseAddrHEX:", ksuseAddrHEX
-
 sgaBaseHEX = hex(int(sgaBaseSQL[0],16))
 print "sgaBaseHEX:", sgaBaseHEX
-
 
 
 
