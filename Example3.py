@@ -4,26 +4,30 @@
 from ctypes import *
 import cx_Oracle
 import os
+from subprocess import Popen, PIPE
 
 
-# Oracle connect
+## ORACLE CONNECTION ESTABLISHMENT
 """
-#conn_str = u'oracle/beer4Admin@TEST1'
-#conn = cx_Oracle.connect(conn_str)
-host = 'localhost'
-port = 1521
-sid = 'test1'
-dsn = cx_Oracle.makedsn(host, port, sid)
+# USE THIS IF CONNECTION IS MADE NOT FROM SYSDBA ON LOCALHOST!
+# conn_str = u'oracle/beer4Admin@TEST1'
+# conn = cx_Oracle.connect(conn_str)
+# host = 'localhost'
+# port = 1521
+# sid = 'test1'
+# dsn = cx_Oracle.makedsn(host, port, sid)
 """
 conn = cx_Oracle.Connection('/', mode = cx_Oracle.SYSDBA)
 cur = conn.cursor()
 
 #c.execute(u'SELECT view_name FROM ALL_VIEWS')
+## SQL REQUESTS
 sqlKsuseAddr = "SELECT RAWTONHEX(min(addr)) FROM X$KSUSE"
 sqlSgaBase = "SELECT RAWTOHEX(addr) FROM sys.x$ksmmem WHERE rownum=1"
 sqlRowCount = "SELECT count(addr) FROM sys.x$ksuse"
 sqlRowSize = "SELECT ((to_dec(f.addr)-to_dec(e.addr))) row_size FROM (SELECT addr FROM x$ksuse WHERE rownum < 2)f, (SELECT min(addr) addr FROM x$ksuse WHERE rownum < 3)e"
 
+## OBTAINING DATA FROM DATABASE
 cur.execute(u'SELECT RAWTONHEX(min(addr)) FROM X$KSUSE')
 for row in cur:
   ksuseAddrSQL = row[0]
@@ -46,28 +50,37 @@ rowSizeDEC = int(rowSizeSQL[0])
 print "rowSizeDEC:", rowSizeDEC
 
 conn.close()
-###
-"""
-IPC Resources for ORACLE_SID "test1" :
-Shared Memory:
-ID		KEY
-18481156	0x00000000
-18513925	0x00000000
-18546694	0xaa5ccb7c
 
-18481156
-000000009A034020
-"""
+## OBTAINING SHMID ID FROM SHARED MEMORY
+osRequest = "pmap `ps ax | grep ora_pmon_${ORACLE_SID} | awk '{print $1}'` | grep shm | awk '{print $5,$1,$2}'"
+
+proc = Popen(
+    osRequest,
+    shell=True,
+    stdout=PIPE, stderr=PIPE
+)
+proc.wait()
+res = proc.communicate()  #tuple('stdout', 'stderr')
+if proc.returncode:
+    print res[1]
+print 'Pmap Result:\n', res[0]
+i = res[0]
+#b = dict( [ (i.split()) for i in i.split('\n') if i != ''])
+#print "TESTING", b
+
+
+
+## GETTING VARIABLES
 # PMAP
-shmid     = 851973
-sgaBase   = 0x60c00000
+shmid     = shmidDEC #851973
+sgaBase   = sgaBaseHEX #0x60c00000 !SHOULD BE SECOND SEGMENT!
 
 # SQL SELECT
-ksuseAddr = 0x9A034020
-rowCount  = 247
-rowSize   = 12512
+ksuseAddr = ksuseAddrHEX #0x9A034020 !changes each time
+rowCount  = rowCountDEC #247
+rowSize   = rowSizeDEC #12512
 
-# SQL OFFSET FOR IDENTIFICATORS
+## SQL OFFSET FOR IDENTIFICATORS
 #  ksspaflg = readSGA.read4(memaddr+0)
 #  ksuseflg = readSGA.read4(memaddr + 5936)
 #  serial = readSGA.read2(memaddr + 5922)
