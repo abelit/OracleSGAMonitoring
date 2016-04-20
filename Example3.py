@@ -52,7 +52,7 @@ print "rowSizeDEC:", rowSizeDEC
 conn.close()
 
 ## OBTAINING SHMID ID FROM SHARED MEMORY
-osRequest = "pmap `ps ax | grep ora_pmon_${ORACLE_SID} | awk '{print $1}'` | grep shm | awk '{print $5,$1,$2}'"
+osRequest = "pmap `ps ax | grep ora_pmon_${ORACLE_SID} | awk '{print $1}'` | grep shm | awk '{print $5,$1,$2}' | awk -F '=0x' '{print $2}'"
 
 proc = Popen(
     osRequest,
@@ -63,10 +63,10 @@ proc.wait()
 res = proc.communicate()  #tuple('stdout', 'stderr')
 if proc.returncode:
     print res[1]
-print 'Pmap Result:\n', res[0]
+print 'Pmap Result:\nshmid segment_start_addr size\n-------------------------------\n', res[0]
 i = res[0]
-#b = dict( [ (i.split()) for i in i.split('\n') if i != ''])
-#print "TESTING", b
+b = dict([ (i.split()) for i in i.split('\n') if i != ''])
+print "TESTING:", b
 
 
 
