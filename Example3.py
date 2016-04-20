@@ -7,21 +7,43 @@ import cx_Oracle
 ### Experiments
 
 # Oracle connect
+"""
 #conn_str = u'oracle/beer4Admin@TEST1'
 #conn = cx_Oracle.connect(conn_str)
 host = 'localhost'
 port = 1521
 sid = 'test1'
 dsn = cx_Oracle.makedsn(host, port, sid)
-
+"""
 conn = cx_Oracle.Connection('/', mode = cx_Oracle.SYSDBA)
-c = conn.cursor()
-#c.execute(u'SELECT view_name FROM ALL_VIEWS')
-c.execute(u'SELECT RAWTONHEX(min(addr)) FROM X$KSUSE')
-for row in c:
-  print row[0]
-conn.close()
+cur = conn.cursor()
 
+#c.execute(u'SELECT view_name FROM ALL_VIEWS')
+sqlKsuseAddr = "SELECT RAWTONHEX(min(addr)) FROM X$KSUSE"
+sqlSgaBase = "SELECT RAWTOHEX(addr) FROM sys.x$ksmmem WHERE rownum=1"
+
+
+cur.execute(u'SELECT RAWTONHEX(min(addr)) FROM X$KSUSE')
+for row in cur:
+  ksuseAddrSQL = row[0]
+  print "ksuseAddrSQL:", ksuseAddrSQL
+
+cur.execute(sqlSgaBase)
+sgaBaseSQL = cur.fetchone()
+print "sgaBaseS:", sgaBaseSQL[0].decode("utf-8")
+
+#To HEX
+ksuseAddrHEX = hex(int(ksuseAddrSQL,16))
+print "ksuseAddrHEX:", ksuseAddrHEX
+
+sgaBaseHEX = hex(int(sgaBaseSQL[0],16))
+print "sgaBaseHEX:", sgaBaseHEX
+
+
+
+
+
+conn.close()
 ###
 """
 IPC Resources for ORACLE_SID "test1" :
