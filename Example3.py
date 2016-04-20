@@ -3,8 +3,8 @@
 
 from ctypes import *
 import cx_Oracle
+import os
 
-### Experiments
 
 # Oracle connect
 """
@@ -21,7 +21,8 @@ cur = conn.cursor()
 #c.execute(u'SELECT view_name FROM ALL_VIEWS')
 sqlKsuseAddr = "SELECT RAWTONHEX(min(addr)) FROM X$KSUSE"
 sqlSgaBase = "SELECT RAWTOHEX(addr) FROM sys.x$ksmmem WHERE rownum=1"
-
+sqlRowCount = "SELECT count(addr) FROM sys.x$ksuse"
+sqlRowSize = "SELECT ((to_dec(f.addr)-to_dec(e.addr))) row_size FROM (SELECT addr FROM x$ksuse WHERE rownum < 2)f, (SELECT min(addr) addr FROM x$ksuse WHERE rownum < 3)e"
 
 cur.execute(u'SELECT RAWTONHEX(min(addr)) FROM X$KSUSE')
 for row in cur:
@@ -34,8 +35,15 @@ sgaBaseSQL = cur.fetchone()
 sgaBaseHEX = hex(int(sgaBaseSQL[0],16))
 print "sgaBaseHEX:", sgaBaseHEX
 
+cur.execute(sqlRowCount)
+rowCountSQL = cur.fetchone()
+rowCountDEC = int(rowCountSQL[0])
+print "rowCountDEC:", rowCountDEC
 
-
+cur.execute(sqlRowSize)
+rowSizeSQL = cur.fetchone()
+rowSizeDEC = int(rowSizeSQL[0])
+print "rowSizeDEC:", rowSizeDEC
 
 conn.close()
 ###
@@ -142,7 +150,7 @@ fo.close()
 
 
 """
-Use SQL as PMAP in python:
+#Use SQL as PMAP in python:
 
 import os
 from subprocess import Popen, PIPE
