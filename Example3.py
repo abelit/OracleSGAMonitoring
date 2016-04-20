@@ -21,11 +21,26 @@ conn = cx_Oracle.Connection('/', mode = cx_Oracle.SYSDBA)
 cur = conn.cursor()
 
 #c.execute(u'SELECT view_name FROM ALL_VIEWS')
+## SQL OFFSET FOR IDENTIFICATORS
+
+#  ksspaflg = readSGA.read4(memaddr+0)
+#  ksuseflg = readSGA.read4(memaddr + 5936)
+#  serial = readSGA.read2(memaddr + 5922)
+#  username = readSGA.reads(memaddr + 6200, 30)
+#  machinename = readSGA.reads(memaddr + 6240, 64)
+#  statusid = readSGA.read1(memaddr + 5976)
+
 ## SQL REQUESTS
 sqlKsuseAddr = "SELECT RAWTONHEX(min(addr)) FROM X$KSUSE"
 sqlSgaBase = "SELECT RAWTOHEX(addr) FROM sys.x$ksmmem WHERE rownum=1"
 sqlRowCount = "SELECT count(addr) FROM sys.x$ksuse"
 sqlRowSize = "SELECT ((to_dec(f.addr)-to_dec(e.addr))) row_size FROM (SELECT addr FROM x$ksuse WHERE rownum < 2)f, (SELECT min(addr) addr FROM x$ksuse WHERE rownum < 3)e"
+sqlKsspaflg = "select c.kqfconam field_name, c.kqfcooff offset, c.kqfcosiz sz from x$kqfco c,x$kqfta t where t.indx = c.kqfcotab and t.kqftanam='X$KSUSE' and c.kqfconam='KSSPAFLG' order by offset"
+sqlKsuseflg = "select c.kqfconam field_name, c.kqfcooff offset, c.kqfcosiz sz from x$kqfco c,x$kqfta t where t.indx = c.kqfcotab and t.kqftanam='X$KSUSE' and c.kqfconam='KSUSEFLG' order by offset"
+sqlSerial = "select c.kqfconam field_name, c.kqfcooff offset, c.kqfcosiz sz from x$kqfco c,x$kqfta t where t.indx = c.kqfcotab and t.kqftanam='X$KSUSE' and c.kqfconam='KSUSESER' order by offset"
+sqlUsername = "select c.kqfconam field_name, c.kqfcooff offset, c.kqfcosiz sz from x$kqfco c,x$kqfta t where t.indx = c.kqfcotab and t.kqftanam='X$KSUSE' and c.kqfconam='KSUSEUNM' order by offset"
+sqlMachinename = "select c.kqfconam field_name, c.kqfcooff offset, c.kqfcosiz sz from x$kqfco c,x$kqfta t where t.indx = c.kqfcotab and t.kqftanam='X$KSUSE' and c.kqfconam='KSUSEMNM' order by offset"
+sqlStatusid = "select c.kqfconam field_name, c.kqfcooff offset, c.kqfcosiz sz from x$kqfco c,x$kqfta t where t.indx = c.kqfcotab and t.kqftanam='X$KSUSE' and c.kqfconam='KSUSEIDL' order by offset"
 
 ## OBTAINING DATA FROM DATABASE
 cur.execute(u'SELECT RAWTONHEX(min(addr)) FROM X$KSUSE')
@@ -49,6 +64,48 @@ rowSizeSQL = cur.fetchone()
 rowSizeDEC = int(rowSizeSQL[0])
 print "rowSizeDEC:", rowSizeDEC
 
+cur.execute(sqlKsspaflg)
+ksspaflgSQL = cur.fetchone()
+ksspaflgOffset = int(ksspaflgSQL[1])
+ksspaflgSize = int(ksspaflgSQL[2])
+print "ksspaflg Offset:", ksspaflgOffset
+
+cur.execute(sqlKsuseflg)
+ksuseflgSQL = cur.fetchone()
+ksuseflgOffset = int(ksuseflgSQL[1])
+ksuseflgSize = int(ksuseflgSQL[2])
+print "ksuseflg Offset:", ksuseflgOffset
+
+cur.execute(sqlSerial)
+serialSQL = cur.fetchone()
+serialOffset = int(serialSQL[1])
+serialSize = int(serialSQL[2])
+print "serial Offset:", serialOffset
+
+cur.execute(sqlUsername)
+usernameSQL = cur.fetchone()
+usernameOffset = int(usernameSQL[1])
+usernameSize = int(usernameSQL[2])
+print "username Offset, Size:", usernameOffset, ",", usernameSize
+
+cur.execute(sqlMachinename)
+machinenameSQL = cur.fetchone()
+machinenameOffset = int(machinenameSQL[1])
+machinenameSize = int(machinenameSQL[2])
+print "machinename Offset, Size:", machinenameOffset, ",", machinenameSize
+
+cur.execute(sqlStatusid)
+statusidSQL = cur.fetchone()
+statusidOffset = int(statusidSQL[1])
+statusidSize = int(statusidSQL[2])
+print "statusid Offset:", statusidOffset
+
+"""
+results = cursor.fetchall()
+for row in results:
+  fname = row[0]
+  lname = row[1]
+"""
 conn.close()
 
 ## OBTAINING SHMID ID FROM SHARED MEMORY
@@ -80,13 +137,7 @@ ksuseAddr = ksuseAddrHEX #0x9A034020 !changes each time
 rowCount  = rowCountDEC #247
 rowSize   = rowSizeDEC #12512
 
-## SQL OFFSET FOR IDENTIFICATORS
-#  ksspaflg = readSGA.read4(memaddr+0)
-#  ksuseflg = readSGA.read4(memaddr + 5936)
-#  serial = readSGA.read2(memaddr + 5922)
-#  username = readSGA.reads(memaddr + 6200, 30)
-#  machinename = readSGA.reads(memaddr + 6240, 64)
-#  statusid = readSGA.read1(memaddr + 5976)
+
 
 
 class SGAException(Exception):
