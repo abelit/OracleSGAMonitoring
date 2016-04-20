@@ -8,6 +8,9 @@ from subprocess import Popen, PIPE
 
 
 ## ORACLE CONNECTION ESTABLISHMENT
+conn = cx_Oracle.Connection('/', mode = cx_Oracle.SYSDBA)
+cur = conn.cursor()
+
 """
 # USE THIS IF CONNECTION IS MADE NOT FROM SYSDBA ON LOCALHOST!
 # conn_str = u'oracle/beer4Admin@TEST1'
@@ -17,20 +20,9 @@ from subprocess import Popen, PIPE
 # sid = 'test1'
 # dsn = cx_Oracle.makedsn(host, port, sid)
 """
-conn = cx_Oracle.Connection('/', mode = cx_Oracle.SYSDBA)
-cur = conn.cursor()
-
-#c.execute(u'SELECT view_name FROM ALL_VIEWS')
-## SQL OFFSET FOR IDENTIFICATORS
-
-#  ksspaflg = readSGA.read4(memaddr+0)
-#  ksuseflg = readSGA.read4(memaddr + 5936)
-#  serial = readSGA.read2(memaddr + 5922)
-#  username = readSGA.reads(memaddr + 6200, 30)
-#  machinename = readSGA.reads(memaddr + 6240, 64)
-#  statusid = readSGA.read1(memaddr + 5976)
 
 ## SQL REQUESTS
+#c.execute(u'SELECT view_name FROM ALL_VIEWS')
 sqlKsuseAddr = "SELECT RAWTONHEX(min(addr)) FROM X$KSUSE"
 sqlSgaBase = "SELECT RAWTOHEX(addr) FROM sys.x$ksmmem WHERE rownum=1"
 sqlRowCount = "SELECT count(addr) FROM sys.x$ksuse"
@@ -100,12 +92,6 @@ statusidOffset = int(statusidSQL[1])
 statusidSize = int(statusidSQL[2])
 print "statusid Offset:", statusidOffset
 
-"""
-results = cursor.fetchall()
-for row in results:
-  fname = row[0]
-  lname = row[1]
-"""
 conn.close()
 
 ## OBTAINING SHMID ID FROM SHARED MEMORY
@@ -126,7 +112,6 @@ b = dict([ (i.split()) for i in i.split('\n') if i != ''])
 print "TESTING:", b
 
 
-
 ## GETTING VARIABLES
 # PMAP
 shmid     = shmidDEC #851973
@@ -138,8 +123,7 @@ rowCount  = rowCountDEC #247
 rowSize   = rowSizeDEC #12512
 
 
-
-
+## READ SGA
 class SGAException(Exception):
   pass
 
@@ -182,7 +166,8 @@ def readstatus(statusid,ksuseflg):
 
 readSGA = ReadSGA(shmid,sgaBase)
 
-# Open a file
+
+## Open a file to write data
 fo = open("foo.txt", "wb")
 print "Writing to file: ", fo.name
 
@@ -206,13 +191,13 @@ for i in range(1,rowCount):
   memaddr += rowSize
 
 
-# Close opend file
+## Close opened file
 fo.close()
 
 
 
 
-
+### TESTING ###
 """
 #Use SQL as PMAP in python:
 
