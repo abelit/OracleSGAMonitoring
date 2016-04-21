@@ -95,7 +95,7 @@ print "statusid Offset:", statusidOffset
 conn.close()
 
 ## OBTAINING SHMID ID FROM SHARED MEMORY
-osRequest = "pmap `ps ax | grep ora_pmon_${ORACLE_SID} | awk '{print $1}'` | grep shm | awk '{print $5,$1,$2}' | awk -F '=' '{print $2}'"
+osRequest = "pmap `ps ax | grep [o]ra_pmon_${ORACLE_SID} | awk '{print $1}'` | grep shm | awk '{print $5,$1,$2}' | awk -F '=' '{print $2}'"
 
 proc = Popen(
     osRequest,
@@ -108,19 +108,35 @@ if proc.returncode:
     print res[1]
 print 'Pmap Result:\nshmid segment_start_addr size\n-------------------------------\n', res[0]
 i = res[0]
-b = dict([ (i.split()) for i in i.split('\n') if i != ''])
+b = i.split()
+#z = dict(i.split('\n'))
+#zz = i.splitlines( num=i.count('\n'))
+#print i.splitlines()
+#c = dict([ (i.split()) for i in i.split('\n') ])
+#b = dict([ (i.split()) for i in i.split('\n') if i != ''])
 print "TESTING:", b
 
+## Cycle to find in which segment containing our SHMID
+i=0
+while i < len(b) :
+#    print int(b[i+1],16)
+#    print ksuseAddrHEX
+#    print int(b[i+1],16)+int(b[i+2][0:len(b[i+2])-1],10)*1024
+    if int(b[i+1],16)<int(ksuseAddrHEX,16)<int(b[i+1],16)+int(b[i+2][0:len(b[i+2])-1],10)*1024 :
+	  break
+#    print "--------------------------------------"
+    i+=3
 
+print "SHMID: ", b[i], " BASE ADDR: ",b[i+1]
+shmid     = int(b[i],16) # 851973
+sgaBase   = int(b[i+1],16) # 0x60c00000 !SHOULD BE SECOND SEGMENT!
+print "SHMID in DEC:", int(b[i],16)
 ## GETTING VARIABLES
-# PMAP
-shmid     = shmidDEC #851973
-sgaBase   = sgaBaseHEX #0x60c00000 !SHOULD BE SECOND SEGMENT!
 
 # SQL SELECT
-ksuseAddr = ksuseAddrHEX #0x9A034020 !changes each time
-rowCount  = rowCountDEC #247
-rowSize   = rowSizeDEC #12512
+ksuseAddr = ksuseAddrHEX # 0x9A034020 !CHANGES EACH TIME!
+rowCount  = rowCountDEC # 247
+rowSize   = rowSizeDEC # 12512
 
 
 ## READ SGA
@@ -176,7 +192,9 @@ fo.write( "       SID    SERIAL# USERNAME   MACHINENAME          STATUS         
 fo.write( "---------- ---------- ---------- -------------------- --------------------------------------------------------------------\n");
 
 # MyDefenitions Oracle 11g
-memaddr = ksuseAddr
+memaddr = int(ksuseAddr,16)
+print "memaddr:", hex(memaddr)
+
 for i in range(1,rowCount):
   ksspaflg = readSGA.read4(memaddr+0)
   ksuseflg = readSGA.read4(memaddr+5936)
@@ -186,11 +204,14 @@ for i in range(1,rowCount):
   machinename = readSGA.reads(memaddr+6240,64)
   statusid = readSGA.read1(memaddr+5976)
   status   = readstatus(statusid,ksuseflg)
-  if (ksspaflg & 1 != 0) and (ksuseflg & 1 != 0) and (serial >= 0):
-    fo.write( "%10d %10d %-10s %-20s %-8s\n" % (sid,serial,username,machinename,status));
+  if (ksspaflg & 1 != 0) and (ksuseflg & 1 != 0) :
+    print "%10d %10d %-10s %-20s %-8s" % (sid, serial, username, machinename, status)
+    fo.write( "%10d %10d %-10s %-64s %-8s\n" % (sid,serial,username,machinename,status));
   memaddr += rowSize
 
 
+
+"""and (serial >= 0)"""
 ## Close opened file
 fo.close()
 

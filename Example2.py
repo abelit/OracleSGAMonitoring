@@ -15,7 +15,7 @@ ID		KEY
 000000009A034020
 """
 
-shmid     = 851973
+shmid     = 458757
 sgaBase   = 0x60c00000
 ksuseAddr = 0x9A034020
 rowCount  = 247
@@ -84,8 +84,9 @@ for i in range(1,rowCount):
   machinename = readSGA.reads(memaddr+6240,64)
   statusid = readSGA.read1(memaddr+5976)
   status   = readstatus(statusid,ksuseflg)
-  if (ksspaflg & 1 != 0) and (ksuseflg & 1 != 0):
-    print "%10d %10d %-10s %-20s %-8s" % (sid,serial,username,machinename,status)
+  print "%10d %10d %-10s %-20s %-8s" % (sid, serial, username, machinename, status)
+  #if (ksspaflg & 1 != 0) and (ksuseflg & 1 != 0):
+    #print "%10d %10d %-10s %-20s %-8s" % (sid,serial,username,machinename,status)
   memaddr += rowSize
 
 
