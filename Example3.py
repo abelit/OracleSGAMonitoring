@@ -33,6 +33,7 @@ sqlSerial = "select c.kqfconam field_name, c.kqfcooff offset, c.kqfcosiz sz from
 sqlUsername = "select c.kqfconam field_name, c.kqfcooff offset, c.kqfcosiz sz from x$kqfco c,x$kqfta t where t.indx = c.kqfcotab and t.kqftanam='X$KSUSE' and c.kqfconam='KSUSEUNM' order by offset"
 sqlMachinename = "select c.kqfconam field_name, c.kqfcooff offset, c.kqfcosiz sz from x$kqfco c,x$kqfta t where t.indx = c.kqfcotab and t.kqftanam='X$KSUSE' and c.kqfconam='KSUSEMNM' order by offset"
 sqlStatusid = "select c.kqfconam field_name, c.kqfcooff offset, c.kqfcosiz sz from x$kqfco c,x$kqfta t where t.indx = c.kqfcotab and t.kqftanam='X$KSUSE' and c.kqfconam='KSUSEIDL' order by offset"
+sqlAllAddr = "SELECT RAWTONHEX(addr) FROM x$ksuse"
 
 ## OBTAINING DATA FROM DATABASE
 cur.execute(u'SELECT RAWTONHEX(min(addr)) FROM X$KSUSE')
@@ -91,6 +92,17 @@ statusidSQL = cur.fetchone()
 statusidOffset = int(statusidSQL[1])
 statusidSize = int(statusidSQL[2])
 print "statusid Offset:", statusidOffset
+
+cur.execute(sqlAllAddr)
+allAddrSQL = cur.fetchall()
+stack = []
+for row in allAddrSQL:
+  stack.append(int(row[0],16))
+print "All row start adresses from KSUSE:\n----------------------------------"
+for element in stack:
+  print hex(element)
+
+#print "All KSUSE Addr:", allAddr
 
 conn.close()
 
