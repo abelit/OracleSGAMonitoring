@@ -109,12 +109,7 @@ if proc.returncode:
 print 'Pmap Result:\nshmid segment_start_addr size\n-------------------------------\n', res[0]
 i = res[0]
 b = i.split()
-#z = dict(i.split('\n'))
-#zz = i.splitlines( num=i.count('\n'))
-#print i.splitlines()
-#c = dict([ (i.split()) for i in i.split('\n') ])
-#b = dict([ (i.split()) for i in i.split('\n') if i != ''])
-print "TESTING:", b
+print "All Segments attached to Ora_mon as a tumple:", b
 
 ## Cycle to find in which segment containing our SHMID
 i=0
