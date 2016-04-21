@@ -134,9 +134,9 @@ print "SHMID in DEC:", int(b[i],16)
 ## GETTING VARIABLES
 
 # SQL SELECT
-ksuseAddr = ksuseAddrHEX # 0x9A034020 !CHANGES EACH TIME!
-rowCount  = rowCountDEC # 247
-rowSize   = rowSizeDEC # 12512
+ksuseAddr = int(ksuseAddrHEX,16) # 0x9A034020 !CHANGES EACH TIME!
+rowCount  = int(rowCountDEC) # 247
+rowSize   = int(rowSizeDEC) # 12512
 
 
 ## READ SGA
@@ -192,7 +192,7 @@ fo.write( "       SID    SERIAL# USERNAME   MACHINENAME          STATUS         
 fo.write( "---------- ---------- ---------- -------------------- --------------------------------------------------------------------\n");
 
 # MyDefenitions Oracle 11g
-memaddr = int(ksuseAddr,16)
+memaddr = ksuseAddr
 print "memaddr:", hex(memaddr)
 
 for i in range(1,rowCount):
@@ -204,14 +204,11 @@ for i in range(1,rowCount):
   machinename = readSGA.reads(memaddr+6240,64)
   statusid = readSGA.read1(memaddr+5976)
   status   = readstatus(statusid,ksuseflg)
-  if (ksspaflg & 1 != 0) and (ksuseflg & 1 != 0) :
+  if (ksspaflg & 1 != 0) and (ksuseflg & 1 != 0) and (serial >= 1):
     print "%10d %10d %-10s %-20s %-8s" % (sid, serial, username, machinename, status)
     fo.write( "%10d %10d %-10s %-64s %-8s\n" % (sid,serial,username,machinename,status));
   memaddr += rowSize
 
-
-
-"""and (serial >= 0)"""
 ## Close opened file
 fo.close()
 
