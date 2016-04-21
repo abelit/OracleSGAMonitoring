@@ -216,6 +216,24 @@ for i in range(1,rowCount):
     fo.write( "%10d %10d %-10s %-64s %-8s\n" % (sid,serial,username,machinename,status));
   memaddr += rowSize
 
+print "\n\n###############################################"
+
+print stack
+for i in stack:
+  #print hex(i)
+  ksspaflg = readSGA.read4(i + ksspaflgOffset)
+  ksuseflg = readSGA.read4(i + ksuseflgOffset)
+  sid = 1
+  serial = readSGA.read2(i + serialOffset)
+  username = readSGA.reads(i + usernameOffset, usernameSize)
+  machinename = readSGA.reads(i + machinenameOffset, machinenameSize)
+  statusid = readSGA.read1(i + statusidOffset)
+  status = readstatus(statusid, ksuseflg)
+  if (ksspaflg & 1 != 0) and (ksuseflg & 1 != 0) and (serial >= 1):
+    print "%10d %10d %-10s %-20s %-8s" % (sid, serial, username, machinename, status)
+    fo.write("%10d %10d %-10s %-64s %-8s\n" % (sid, serial, username, machinename, status));
+  sid += 1
+
 ## Close opened file
 fo.close()
 
