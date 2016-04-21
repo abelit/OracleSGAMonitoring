@@ -196,13 +196,13 @@ memaddr = ksuseAddr
 print "memaddr:", hex(memaddr)
 
 for i in range(1,rowCount):
-  ksspaflg = readSGA.read4(memaddr+0)
-  ksuseflg = readSGA.read4(memaddr+5936)
+  ksspaflg = readSGA.read4(memaddr+ksspaflgOffset)
+  ksuseflg = readSGA.read4(memaddr+ksuseflgOffset)
   sid      = i
-  serial   = readSGA.read2(memaddr+5922)
-  username = readSGA.reads(memaddr+6200,30)
-  machinename = readSGA.reads(memaddr+6240,64)
-  statusid = readSGA.read1(memaddr+5976)
+  serial   = readSGA.read2(memaddr+serialOffset)
+  username = readSGA.reads(memaddr+usernameOffset,usernameSize)
+  machinename = readSGA.reads(memaddr+machinenameOffset,machinenameSize)
+  statusid = readSGA.read1(memaddr+statusidOffset)
   status   = readstatus(statusid,ksuseflg)
   if (ksspaflg & 1 != 0) and (ksuseflg & 1 != 0) and (serial >= 1):
     print "%10d %10d %-10s %-20s %-8s" % (sid, serial, username, machinename, status)
