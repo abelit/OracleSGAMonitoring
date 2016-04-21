@@ -219,11 +219,12 @@ for i in range(1,rowCount):
 print "\n\n###############################################"
 
 print stack
+sid = 0
 for i in stack:
   #print hex(i)
   ksspaflg = readSGA.read4(i + ksspaflgOffset)
   ksuseflg = readSGA.read4(i + ksuseflgOffset)
-  sid = 1
+  sid += 1
   serial = readSGA.read2(i + serialOffset)
   username = readSGA.reads(i + usernameOffset, usernameSize)
   machinename = readSGA.reads(i + machinenameOffset, machinenameSize)
@@ -232,7 +233,6 @@ for i in stack:
   if (ksspaflg & 1 != 0) and (ksuseflg & 1 != 0) and (serial >= 1):
     print "%10d %10d %-10s %-20s %-8s" % (sid, serial, username, machinename, status)
     fo.write("%10d %10d %-10s %-64s %-8s\n" % (sid, serial, username, machinename, status));
-  sid += 1
 
 ## Close opened file
 fo.close()
