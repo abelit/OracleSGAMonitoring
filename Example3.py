@@ -251,9 +251,17 @@ for i in range(1,rowCount):
   sid      = i
   serial   = readSGA.read2(memaddr+serialOffset)
   username = readSGA.reads(memaddr+usernameOffset,usernameSize)
+  osusername = ""
   machinename = readSGA.reads(memaddr+machinenameOffset,machinenameSize)
   statusid = readSGA.read1(memaddr+statusidOffset)
   status   = readstatus(statusid,ksuseflg)
+  index    = readSGA.read4(memaddr+indexOffset)
+  sequence = readSGA.read2(memaddr+sequenceOffset)
+  event    = readSGA.read2(memaddr+eventOffset)
+  p1       = readSGA.reads(memaddr+p1Offset,p1Size)
+  p2       = readSGA.reads(memaddr+p2Offset,p2Size)
+  p3       = readSGA.reads(memaddr+p3Offset,p3Size)
+
   if (ksspaflg & 1 != 0) and (ksuseflg & 1 != 0) and (serial >= 1):
     print "%10d %10d %-10s %-20s %-8s" % (sid, serial, username, machinename, status)
     fo.write( "%10d %10d %-10s %-64s %-8s\n" % (sid,serial,username,machinename,status));
