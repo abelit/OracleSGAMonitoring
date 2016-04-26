@@ -274,7 +274,11 @@ for i in stack:
   index    = readSGA.read4(i+indexOffset)
   sequence = readSGA.read2(i+sequenceOffset)
   event    = readSGA.read2(i+eventOffset)
-  eventDef = tableKsled[event]
+  if event in tableKsled:
+    eventDef = tableKsled[event]
+  else:
+    print "Can't find definition in X$KSLED table for session:", i
+  #eventDef = tableKsled[event]
   p1       = readSGA.reads(i+p1Offset,p1Size)
   p2       = readSGA.reads(i+p2Offset,p2Size)
   p3       = readSGA.reads(i+p3Offset,p3Size)
