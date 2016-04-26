@@ -245,6 +245,7 @@ fo.write( "---------- ---------- ---------- -------------------- ---------------
 memaddr = ksuseAddr
 print "memaddr:", hex(memaddr)
 
+"""
 for i in range(1,rowCount):
   ksspaflg = readSGA.read4(memaddr+ksspaflgOffset)
   ksuseflg = readSGA.read4(memaddr+ksuseflgOffset)
@@ -266,11 +267,14 @@ for i in range(1,rowCount):
     print "%10d %10d %-10s %-20s %-8s %10d %10d %-10s" % (sid, serial, username, machinename, status, index, sequence, event)
     fo.write( "%10d %10d %-10s %-64s %-8s %10d %10d %-10s\n" % (sid, serial, username, machinename, status, index, sequence, event));
   memaddr += rowSize
+"""
 
 print "\n\n###############################################"
 
 print stack
-
+print( "'select from v$session' made by reading SGA directly:\n");
+print( "       SID    SERIAL# USERNAME   MACHINENAME          STATUS        Index   Sequence Event                     \n");
+print( "---------- ---------- ---------- -------------------- --------------------------------------------------------------------\n");
 
 sid = 0
 for i in stack:
