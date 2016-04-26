@@ -277,7 +277,7 @@ for i in stack:
   if event in tableKsled:
     eventDef = tableKsled[event]
   else:
-    print "Can't find definition in X$KSLED table for session:", i
+    eventDef = "Can't find definition in X$KSLED table for session: %s" % (i)
   #eventDef = tableKsled[event]
   p1       = readSGA.reads(i+p1Offset,p1Size)
   p2       = readSGA.reads(i+p2Offset,p2Size)
