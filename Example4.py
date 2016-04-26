@@ -32,8 +32,6 @@ sqlEvent = "select c.kqfconam field_name, c.kqfcooff offset, c.kqfcosiz sz from 
 sqlP1 = "select c.kqfconam field_name, c.kqfcooff offset, c.kqfcosiz sz from x$kqfco c,x$kqfta t where t.indx = c.kqfcotab and t.kqftanam='X$KSUSE' and c.kqfconam='KSUSEP1' order by offset"
 sqlP2 = "select c.kqfconam field_name, c.kqfcooff offset, c.kqfcosiz sz from x$kqfco c,x$kqfta t where t.indx = c.kqfcotab and t.kqftanam='X$KSUSE' and c.kqfconam='KSUSEP2' order by offset"
 sqlP3 = "select c.kqfconam field_name, c.kqfcooff offset, c.kqfcosiz sz from x$kqfco c,x$kqfta t where t.indx = c.kqfcotab and t.kqftanam='X$KSUSE' and c.kqfconam='KSUSEP3' order by offset"
-sqlKsled = "select INDX, RAWTONHEX(ADDR), KSLEDNAM from x$ksled;"
-sqlKsledTable = "select * from x$ksled"
 
 
 ## OBTAINING DATA FROM DATABASE
@@ -135,28 +133,14 @@ allAddrSQL = cur.fetchall()
 stack = []
 for row in allAddrSQL:
   stack.append(int(row[0],16))
-#print "All row start adresses from KSUSE:\n----------------------------------"
-#for element in stack:
-#  print hex(element)
+
 
 cur.execute("select INDX, KSLEDNAM from X$KSLED")
 ksledTableSQL = cur.fetchall()
 tableKsled = dict([i for i in ksledTableSQL])
 
-
-if 0 in tableKsled:
-  print "Hello %s" %tableKsled[0]
-else:
-  print "Can't find definition in X$KSLED table"
-#print ksledTableSQL
-#for row in ksledTableSQL:
- # print row[0], row[1]
-  #tableKsled.append(int(row[1],10))
-  #tableKsled.append(str(row[4]))
-
-print "&&&&&&&&&&:\n", tableKsled
-
 conn.close()
+
 
 ## OBTAINING SHMID ID FROM SHARED MEMORY
 osRequest = "pmap `ps ax | grep [o]ra_pmon_${ORACLE_SID} | awk '{print $1}'` | grep shm | awk '{print $5,$1,$2}' | awk -F '=' '{print $2}'"
@@ -290,19 +274,3 @@ for i in stack:
 fo.close()
 
 
-
-
-### TESTING ###
-"""
-#Use SQL as PMAP in python:
-
-import os
-from subprocess import Popen, PIPE
-
-sqlplus = Popen(["sqlplus", "-S", "/", "as", "sysdba"], stdout=PIPE, stdin=PIPE)
-sqlplus.stdin.write("select sysdate from dual;"+os.linesep)
-sqlplus.stdin.write("select count(*) from all_objects;"+os.linesep)
-out, err = sqlplus.communicate()
-print out
-
-"""
