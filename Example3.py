@@ -100,6 +100,42 @@ statusidOffset = int(statusidSQL[1])
 statusidSize = int(statusidSQL[2])
 print "statusid Offset:", statusidOffset
 
+cur.execute(sqlIndex)
+indexSQL = cur.fetchone()
+indexOffset = int(indexSQL[1])
+indexSize = int(indexSQL[2])
+print "index Offset:", indexOffset
+
+cur.execute(sqlSequence)
+sequenceSQL = cur.fetchone()
+sequenceOffset = int(sequenceSQL[1])
+sequenceSize = int(sequenceSQL[2])
+print "sequence Offset:", sequenceOffset
+
+cur.execute(sqlEvent)
+eventSQL = cur.fetchone()
+eventOffset = int(eventSQL[1])
+eventSize = int(eventSQL[2])
+print "event Offset:", eventOffset
+
+cur.execute(sqlP1)
+p1SQL = cur.fetchone()
+p1Offset = int(p1SQL[1])
+p1Size = int(p1SQL[2])
+print "p1 Offset:", p1Offset
+
+cur.execute(sqlP2)
+p2SQL = cur.fetchone()
+p2Offset = int(p2SQL[1])
+p2Size = int(p2SQL[2])
+print "p2 Offset:", p2Offset
+
+cur.execute(sqlP3)
+p3SQL = cur.fetchone()
+p3Offset = int(p3SQL[1])
+p3Size = int(p3SQL[2])
+print "p3 Offset:", p3Offset
+
 cur.execute(sqlAllAddr)
 allAddrSQL = cur.fetchall()
 stack = []
