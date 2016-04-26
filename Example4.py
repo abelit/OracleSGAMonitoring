@@ -134,9 +134,9 @@ allAddrSQL = cur.fetchall()
 stack = []
 for row in allAddrSQL:
   stack.append(int(row[0],16))
-print "All row start adresses from KSUSE:\n----------------------------------"
-for element in stack:
-  print hex(element)
+#print "All row start adresses from KSUSE:\n----------------------------------"
+#for element in stack:
+#  print hex(element)
 
 #print "All KSUSE Addr:", allAddr
 
@@ -228,7 +228,7 @@ readSGA = ReadSGA(shmid,sgaBase)
 
 ## Open a file to write data
 fo = open("foo.txt", "wb")
-print "Writing to file: ", fo.name
+#print "Writing to file: ", fo.name
 
 fo.write( "'select from v$session' made by reading SGA directly:\n");
 fo.write( "       SID    SERIAL# USERNAME   MACHINENAME          STATUS                                                             \n");
@@ -240,7 +240,7 @@ print "memaddr:", hex(memaddr)
 
 
 print stack
-print( "'select from v$session' made by reading SGA directly:\n");
+print( "\n'select from v$session' made by reading SGA directly:\n");
 print( "       SID    SERIAL# USERNAME   MACHINENAME          STATUS        Index   Sequence Event                     \n");
 print( "---------- ---------- ---------- -------------------- --------------------------------------------------------------------\n");
 
