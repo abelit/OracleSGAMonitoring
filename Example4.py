@@ -174,8 +174,8 @@ print "SHMID: ", b[i], " BASE ADDR: ",b[i+1]
 shmid     = int(b[i],16) # 851973
 sgaBase   = int(b[i+1],16) # 0x60c00000 !SHOULD BE SECOND SEGMENT!
 print "SHMID in DEC:", int(b[i],16)
-## GETTING VARIABLES
 
+## GETTING VARIABLES
 # SQL SELECT
 ksuseAddr = int(ksuseAddrHEX,16) # 0x9A034020 !CHANGES EACH TIME!
 rowCount  = int(rowCountDEC) # 247
@@ -228,8 +228,8 @@ readSGA = ReadSGA(shmid,sgaBase)
 
 ## Open a file to write data
 fo = open("foo.txt", "wb")
-#print "Writing to file: ", fo.name
 
+#print "Writing to file: ", fo.name
 fo.write( "'select from v$session' made by reading SGA directly:\n");
 fo.write( "       SID    SERIAL# USERNAME   MACHINENAME          STATUS                                                             \n");
 fo.write( "---------- ---------- ---------- -------------------- --------------------------------------------------------------------\n");
@@ -237,16 +237,14 @@ fo.write( "---------- ---------- ---------- -------------------- ---------------
 # MyDefenitions Oracle 11g
 memaddr = ksuseAddr
 print "memaddr:", hex(memaddr)
-
-
 print stack
+
 print( "\n'select from v$session' made by reading SGA directly:\n");
 print( "       SID    SERIAL# USERNAME   MACHINENAME          STATUS        Index   Sequence Event     Event_defenition                \n");
 print( "---------- ---------- ---------- -------------------- --------------------------------------------------------------------\n");
 
 sid = 0
 for i in stack:
-  #print hex(i)
   ksspaflg = readSGA.read4(i + ksspaflgOffset)
   ksuseflg = readSGA.read4(i + ksuseflgOffset)
   sid += 1
@@ -262,7 +260,6 @@ for i in stack:
     eventDef = tableKsled[event]
   else:
     eventDef = "Can't find definition in X$KSLED table for session: %s" % (i)
-  #eventDef = tableKsled[event]
   p1       = readSGA.reads(i+p1Offset,p1Size)
   p2       = readSGA.reads(i+p2Offset,p2Size)
   p3       = readSGA.reads(i+p3Offset,p3Size)
