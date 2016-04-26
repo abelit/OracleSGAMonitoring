@@ -263,13 +263,15 @@ for i in range(1,rowCount):
   p3       = readSGA.reads(memaddr+p3Offset,p3Size)
 
   if (ksspaflg & 1 != 0) and (ksuseflg & 1 != 0) and (serial >= 1):
-    print "%10d %10d %-10s %-20s %-8s" % (sid, serial, username, machinename, status)
-    fo.write( "%10d %10d %-10s %-64s %-8s\n" % (sid,serial,username,machinename,status));
+    print "%10d %10d %-10s %-20s %-8s %10d %10d %-10s" % (sid, serial, username, machinename, status, index, sequence, event)
+    fo.write( "%10d %10d %-10s %-64s %-8s %10d %10d %-10s\n" % (sid, serial, username, machinename, status, index, sequence, event));
   memaddr += rowSize
 
 print "\n\n###############################################"
 
 print stack
+
+
 sid = 0
 for i in stack:
   #print hex(i)
@@ -281,9 +283,15 @@ for i in stack:
   machinename = readSGA.reads(i + machinenameOffset, machinenameSize)
   statusid = readSGA.read1(i + statusidOffset)
   status = readstatus(statusid, ksuseflg)
+  index    = readSGA.read4(i+indexOffset)
+  sequence = readSGA.read2(i+sequenceOffset)
+  event    = readSGA.read2(i+eventOffset)
+  p1       = readSGA.reads(i+p1Offset,p1Size)
+  p2       = readSGA.reads(i+p2Offset,p2Size)
+  p3       = readSGA.reads(i+p3Offset,p3Size)
   if (ksspaflg & 1 != 0) and (ksuseflg & 1 != 0) and (serial >= 1):
-    print "%10d %10d %-10s %-20s %-8s" % (sid, serial, username, machinename, status)
-    fo.write("%10d %10d %-10s %-64s %-8s\n" % (sid, serial, username, machinename, status));
+    print "%10d %10d %-10s %-20s %-8s %10d %10d %-10s" % (sid, serial, username, machinename, status, index, sequence, event)
+    fo.write("%10d %10d %-10s %-64s %-8s %10d %10d %-10s\n" % (sid, serial, username, machinename, status, index, sequence, event));
 
 ## Close opened file
 fo.close()
