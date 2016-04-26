@@ -11,15 +11,6 @@ from subprocess import Popen, PIPE
 conn = cx_Oracle.Connection('/', mode = cx_Oracle.SYSDBA)
 cur = conn.cursor()
 
-"""
-# USE THIS IF CONNECTION IS MADE NOT FROM SYSDBA ON LOCALHOST!
-# conn_str = u'oracle/beer4Admin@TEST1'
-# conn = cx_Oracle.connect(conn_str)
-# host = 'localhost'
-# port = 1521
-# sid = 'test1'
-# dsn = cx_Oracle.makedsn(host, port, sid)
-"""
 
 ## SQL REQUESTS
 #c.execute(u'SELECT view_name FROM ALL_VIEWS')
@@ -247,31 +238,6 @@ fo.write( "---------- ---------- ---------- -------------------- ---------------
 memaddr = ksuseAddr
 print "memaddr:", hex(memaddr)
 
-"""
-for i in range(1,rowCount):
-  ksspaflg = readSGA.read4(memaddr+ksspaflgOffset)
-  ksuseflg = readSGA.read4(memaddr+ksuseflgOffset)
-  sid      = i
-  serial   = readSGA.read2(memaddr+serialOffset)
-  username = readSGA.reads(memaddr+usernameOffset,usernameSize)
-  osusername = ""
-  machinename = readSGA.reads(memaddr+machinenameOffset,machinenameSize)
-  statusid = readSGA.read1(memaddr+statusidOffset)
-  status   = readstatus(statusid,ksuseflg)
-  index    = readSGA.read4(memaddr+indexOffset)
-  sequence = readSGA.read2(memaddr+sequenceOffset)
-  event    = readSGA.read2(memaddr+eventOffset)
-  p1       = readSGA.reads(memaddr+p1Offset,p1Size)
-  p2       = readSGA.reads(memaddr+p2Offset,p2Size)
-  p3       = readSGA.reads(memaddr+p3Offset,p3Size)
-
-  if (ksspaflg & 1 != 0) and (ksuseflg & 1 != 0) and (serial >= 1):
-    print "%10d %10d %-10s %-20s %-8s %10d %10d %-10s" % (sid, serial, username, machinename, status, index, sequence, event)
-    fo.write( "%10d %10d %-10s %-64s %-8s %10d %10d %-10s\n" % (sid, serial, username, machinename, status, index, sequence, event));
-  memaddr += rowSize
-"""
-
-print "\n\n###############################################"
 
 print stack
 print( "'select from v$session' made by reading SGA directly:\n");
