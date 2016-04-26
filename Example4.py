@@ -33,6 +33,7 @@ sqlP1 = "select c.kqfconam field_name, c.kqfcooff offset, c.kqfcosiz sz from x$k
 sqlP2 = "select c.kqfconam field_name, c.kqfcooff offset, c.kqfcosiz sz from x$kqfco c,x$kqfta t where t.indx = c.kqfcotab and t.kqftanam='X$KSUSE' and c.kqfconam='KSUSEP2' order by offset"
 sqlP3 = "select c.kqfconam field_name, c.kqfcooff offset, c.kqfcosiz sz from x$kqfco c,x$kqfta t where t.indx = c.kqfcotab and t.kqftanam='X$KSUSE' and c.kqfconam='KSUSEP3' order by offset"
 sqlKsled = "select INDX, RAWTONHEX(ADDR), KSLEDNAM from x$ksled;"
+sqlKsledTable = "select * from x$ksled"
 
 
 ## OBTAINING DATA FROM DATABASE
@@ -138,7 +139,22 @@ for row in allAddrSQL:
 #for element in stack:
 #  print hex(element)
 
-#print "All KSUSE Addr:", allAddr
+cur.execute("select INDX, KSLEDNAM from X$KSLED")
+ksledTableSQL = cur.fetchall()
+tableKsled = dict([i for i in ksledTableSQL])
+
+
+if 0 in tableKsled:
+  print "Hello %s" %tableKsled[0]
+else:
+  print "Can't find definition in X$KSLED table"
+#print ksledTableSQL
+#for row in ksledTableSQL:
+ # print row[0], row[1]
+  #tableKsled.append(int(row[1],10))
+  #tableKsled.append(str(row[4]))
+
+print "&&&&&&&&&&:\n", tableKsled
 
 conn.close()
 
@@ -241,7 +257,7 @@ print "memaddr:", hex(memaddr)
 
 print stack
 print( "\n'select from v$session' made by reading SGA directly:\n");
-print( "       SID    SERIAL# USERNAME   MACHINENAME          STATUS        Index   Sequence Event                     \n");
+print( "       SID    SERIAL# USERNAME   MACHINENAME          STATUS        Index   Sequence Event     Event_defenition                \n");
 print( "---------- ---------- ---------- -------------------- --------------------------------------------------------------------\n");
 
 sid = 0
@@ -258,11 +274,12 @@ for i in stack:
   index    = readSGA.read4(i+indexOffset)
   sequence = readSGA.read2(i+sequenceOffset)
   event    = readSGA.read2(i+eventOffset)
+  eventDef = tableKsled[event]
   p1       = readSGA.reads(i+p1Offset,p1Size)
   p2       = readSGA.reads(i+p2Offset,p2Size)
   p3       = readSGA.reads(i+p3Offset,p3Size)
   if (ksspaflg & 1 != 0) and (ksuseflg & 1 != 0) and (serial >= 1):
-    print "%10d %10d %-10s %-20s %-8s %10d %10d %-10s" % (sid, serial, username, machinename, status, index, sequence, event)
+    print "%10d %10d %-10s %-20s %-8s %10d %10d %-10s %-10s" % (sid, serial, username, machinename, status, index, sequence, event, eventDef)
     fo.write("%10d %10d %-10s %-64s %-8s %10d %10d %-10s\n" % (sid, serial, username, machinename, status, index, sequence, event));
 
 ## Close opened file
