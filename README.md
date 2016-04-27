@@ -1,4 +1,5 @@
 # OracleSGAMonitoring
+# Example4 - Последняя версия
 
 To Do List:
   1. Ignore Event Class (Idle)
@@ -6,7 +7,10 @@ To Do List:
   3. Print time of when execution
   4. Parameterize sleep time in cycle
   5. PMAP for different OS-types
-  6. 
+  6. P1, P2, P3 - show. Данные по событиям
+  7. 
+  
+wait event enqueue - блокировка и тип блокировки (P2?). Latch free wait event (защелки внутренние) - вывести тип, что за защелка. Latch name
 
 
 
