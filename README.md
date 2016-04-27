@@ -1,7 +1,7 @@
 # OracleSGAMonitoring
 
-To Do List:
-1. Ignore Event Class (Wait)
+To Do List:\
+1. Ignore Event Class (Idle)\
 2. Read SGA in cycle
 3. Print time of when execution
 4. Parameterize sleep time in cycle
