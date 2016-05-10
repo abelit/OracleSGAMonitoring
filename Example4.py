@@ -5,7 +5,7 @@ from ctypes import *
 import cx_Oracle
 import os
 from subprocess import Popen, PIPE
-
+from datetime import datetime
 
 ## ORACLE CONNECTION ESTABLISHMENT
 conn = cx_Oracle.Connection('/', mode = cx_Oracle.SYSDBA)
@@ -229,19 +229,29 @@ readSGA = ReadSGA(shmid,sgaBase)
 ## Open a file to write data
 fo = open("foo.txt", "wb")
 
-#print "Writing to file: ", fo.name
-fo.write( "'select from v$session' made by reading SGA directly:\n");
-fo.write( "       SID    SERIAL# USERNAME   MACHINENAME          STATUS                                                             \n");
-fo.write( "---------- ---------- ---------- -------------------- --------------------------------------------------------------------\n");
+## CYCLE_BEGIN
 
 # MyDefenitions Oracle 11g
 memaddr = ksuseAddr
 print "memaddr:", hex(memaddr)
 print stack
 
-print( "\n'select from v$session' made by reading SGA directly:\n");
+# get time execution
+execTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+print execTime, "\n"
+
+#print "Writing to file: ", fo.name
+fo.write( "'select from v$session' made by reading SGA directly at time: %s\n" % (execTime));
+fo.write( "       SID    SERIAL# USERNAME   MACHINENAME          STATUS                                                             \n");
+fo.write( "---------- ---------- ---------- -------------------- --------------------------------------------------------------------\n");
+
+
+
+print( "\n'select from v$session' made by reading SGA directly: %s\n" % (execTime));
 print( "       SID    SERIAL# USERNAME   MACHINENAME          STATUS        Index   Sequence Event     P1        Event_defenition                \n");
 print( "---------- ---------- ---------- -------------------- --------------------------------------------------------------------\n");
+
+
 
 sid = 0
 for i in stack:
