@@ -6,6 +6,7 @@ import cx_Oracle
 import os
 from subprocess import Popen, PIPE
 from datetime import datetime
+import time
 
 ## ORACLE CONNECTION ESTABLISHMENT
 conn = cx_Oracle.Connection('/', mode = cx_Oracle.SYSDBA)
@@ -230,52 +231,49 @@ readSGA = ReadSGA(shmid,sgaBase)
 fo = open("foo.txt", "wb")
 
 ## CYCLE_BEGIN
+for i in xrange(3):
+     # MyDefenitions Oracle 11g
+     memaddr = ksuseAddr
+     print "memaddr:", hex(memaddr)
+     print stack
 
-# MyDefenitions Oracle 11g
-memaddr = ksuseAddr
-print "memaddr:", hex(memaddr)
-print stack
+     # get time execution
+     execTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+     print execTime, "\n"
 
-# get time execution
-execTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-print execTime, "\n"
+     #print "Writing to file: ", fo.name
+     fo.write( "'select from v$session' made by reading SGA directly at time: %s\n" % (execTime));
+     fo.write( "       SID    SERIAL# USERNAME   MACHINENAME          STATUS                                                             \n");
+     fo.write( "---------- ---------- ---------- -------------------- --------------------------------------------------------------------\n");
 
-#print "Writing to file: ", fo.name
-fo.write( "'select from v$session' made by reading SGA directly at time: %s\n" % (execTime));
-fo.write( "       SID    SERIAL# USERNAME   MACHINENAME          STATUS                                                             \n");
-fo.write( "---------- ---------- ---------- -------------------- --------------------------------------------------------------------\n");
+     print( "\n'select from v$session' made by reading SGA directly: %s\n" % (execTime));
+     print( "       SID    SERIAL# USERNAME   MACHINENAME          STATUS        Index   Sequence Event     P1        Event_defenition                \n");
+     print( "---------- ---------- ---------- -------------------- --------------------------------------------------------------------\n");
 
-
-
-print( "\n'select from v$session' made by reading SGA directly: %s\n" % (execTime));
-print( "       SID    SERIAL# USERNAME   MACHINENAME          STATUS        Index   Sequence Event     P1        Event_defenition                \n");
-print( "---------- ---------- ---------- -------------------- --------------------------------------------------------------------\n");
-
-
-
-sid = 0
-for i in stack:
-  ksspaflg = readSGA.read4(i + ksspaflgOffset)
-  ksuseflg = readSGA.read4(i + ksuseflgOffset)
-  sid += 1
-  serial = readSGA.read2(i + serialOffset)
-  username = readSGA.reads(i + usernameOffset, usernameSize)
-  machinename = readSGA.reads(i + machinenameOffset, machinenameSize)
-  statusid = readSGA.read1(i + statusidOffset)
-  status = readstatus(statusid, ksuseflg)
-  index    = readSGA.read4(i+indexOffset)
-  sequence = readSGA.read2(i+sequenceOffset)
-  event    = readSGA.read2(i+eventOffset)
-  if event in tableKsled:
-    eventDef = tableKsled[event]
-  else:
-    eventDef = "Can't find definition in X$KSLED table for session: %s" % (i)
-  p1 = readSGA.reads(i+p1Offset,p1Size)
-  p2 = readSGA.reads(i+p2Offset,p2Size)
-  p3 = readSGA.reads(i+p3Offset,p3Size)
-  if (ksspaflg & 1 != 0) and (ksuseflg & 1 != 0) and (serial >= 1):
-    print "%10d %10d %-10s %-20s %-8s %10d %10d %-10s %-8s %-10s" % (sid, serial, username, machinename, status, index, sequence, event, p1, eventDef)
-    fo.write("%10d %10d %-10s %-64s %-8s %10d %10d %-10s %-10s\n" % (sid, serial, username, machinename, status, index, sequence, event, eventDef));
+     sid = 0
+     for i in stack:
+       ksspaflg = readSGA.read4(i + ksspaflgOffset)
+       ksuseflg = readSGA.read4(i + ksuseflgOffset)
+       sid += 1
+       serial = readSGA.read2(i + serialOffset)
+       username = readSGA.reads(i + usernameOffset, usernameSize)
+       machinename = readSGA.reads(i + machinenameOffset, machinenameSize)
+       statusid = readSGA.read1(i + statusidOffset)
+       status = readstatus(statusid, ksuseflg)
+       index    = readSGA.read4(i+indexOffset)
+       sequence = readSGA.read2(i+sequenceOffset)
+       event    = readSGA.read2(i+eventOffset)
+       if event in tableKsled:
+         eventDef = tableKsled[event]
+       else:
+         eventDef = "Can't find definition in X$KSLED table for session: %s" % (i)
+       p1 = readSGA.reads(i+p1Offset,p1Size)
+       p2 = readSGA.reads(i+p2Offset,p2Size)
+       p3 = readSGA.reads(i+p3Offset,p3Size)
+       if (ksspaflg & 1 != 0) and (ksuseflg & 1 != 0) and (serial >= 1):
+         print "%10d %10d %-10s %-20s %-8s %10d %10d %-10s %-8s %-10s" % (sid, serial, username, machinename, status, index, sequence, event, p1, eventDef)
+         fo.write("%10d %10d %-10s %-64s %-8s %10d %10d %-10s %-10s\n" % (sid, serial, username, machinename, status, index, sequence, event, eventDef));
+     time.sleep(5)
 
 ## Close opened file
 fo.close()
