@@ -240,7 +240,7 @@ print "memaddr:", hex(memaddr)
 print stack
 
 print( "\n'select from v$session' made by reading SGA directly:\n");
-print( "       SID    SERIAL# USERNAME   MACHINENAME          STATUS        Index   Sequence Event     Event_defenition                \n");
+print( "       SID    SERIAL# USERNAME   MACHINENAME          STATUS        Index   Sequence Event     P1        Event_defenition                \n");
 print( "---------- ---------- ---------- -------------------- --------------------------------------------------------------------\n");
 
 sid = 0
@@ -260,12 +260,12 @@ for i in stack:
     eventDef = tableKsled[event]
   else:
     eventDef = "Can't find definition in X$KSLED table for session: %s" % (i)
-  p1       = readSGA.reads(i+p1Offset,p1Size)
-  p2       = readSGA.reads(i+p2Offset,p2Size)
-  p3       = readSGA.reads(i+p3Offset,p3Size)
+  p1 = readSGA.reads(i+p1Offset,p1Size)
+  p2 = readSGA.reads(i+p2Offset,p2Size)
+  p3 = readSGA.reads(i+p3Offset,p3Size)
   if (ksspaflg & 1 != 0) and (ksuseflg & 1 != 0) and (serial >= 1):
-    print "%10d %10d %-10s %-20s %-8s %10d %10d %-10s %-10s" % (sid, serial, username, machinename, status, index, sequence, event, eventDef)
-    fo.write("%10d %10d %-10s %-64s %-8s %10d %10d %-10s\n" % (sid, serial, username, machinename, status, index, sequence, event));
+    print "%10d %10d %-10s %-20s %-8s %10d %10d %-10s %-8s %-10s" % (sid, serial, username, machinename, status, index, sequence, event, p1, eventDef)
+    fo.write("%10d %10d %-10s %-64s %-8s %10d %10d %-10s %-10s\n" % (sid, serial, username, machinename, status, index, sequence, event, eventDef));
 
 ## Close opened file
 fo.close()
