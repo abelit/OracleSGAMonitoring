@@ -8,6 +8,13 @@ from subprocess import Popen, PIPE
 from datetime import datetime
 import time
 
+from ctypes import string_at # test
+from sys import getsizeof    # test
+from binascii import hexlify # test
+
+import struct
+from struct import *
+
 ## ORACLE CONNECTION ESTABLISHMENT
 conn = cx_Oracle.Connection('/', mode = cx_Oracle.SYSDBA)
 cur = conn.cursor()
@@ -231,7 +238,9 @@ readSGA = ReadSGA(shmid,sgaBase)
 fo = open("foo.txt", "wb")
 
 ## CYCLE_BEGIN
-for i in xrange(3):
+#for i in xrange(3):
+t_end = time.time() + 15
+while time.time() < t_end:
      # MyDefenitions Oracle 11g
      memaddr = ksuseAddr
      print "memaddr:", hex(memaddr)
@@ -268,12 +277,20 @@ for i in xrange(3):
        else:
          eventDef = "Can't find definition in X$KSLED table for session: %s" % (i)
        p1 = readSGA.reads(i+p1Offset,p1Size)
+       z1 = hexlify(string_at(id(p1),p1Size))
+       #print (calcsize(p1))
+       if len(p1) == 0:
+           continue
+       #print type(i),len(p1),'REPRESENTATION_P1:', repr(p1)
+       print
+       #t1 = struct.unpack('P',p1)
        p2 = readSGA.reads(i+p2Offset,p2Size)
        p3 = readSGA.reads(i+p3Offset,p3Size)
        if (ksspaflg & 1 != 0) and (ksuseflg & 1 != 0) and (serial >= 1):
-         print "%10d %10d %-10s %-20s %-8s %10d %10d %-10s %-8s %-10s" % (sid, serial, username, machinename, status, index, sequence, event, p1, eventDef)
+         #print "%10d %10d %-10s %-20s %-8s %10d %10d %-10s '%8s' %-10s" % (sid, serial, username, machinename, status, index, sequence, event, p1, eventDef)
+         print "%10d %10d %-10s %-20s %-8s %10d %10d %-10s %-10s" % (sid, serial, username, machinename, status, index, sequence, event, eventDef)
          fo.write("%10d %10d %-10s %-64s %-8s %10d %10d %-10s %-10s\n" % (sid, serial, username, machinename, status, index, sequence, event, eventDef));
-     time.sleep(5)
+     #time.sleep(5)
 
 ## Close opened file
 fo.close()
