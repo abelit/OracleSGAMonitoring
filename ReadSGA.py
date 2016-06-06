@@ -8,15 +8,13 @@
 from ctypes import *
 import cx_Oracle
 import os
+import time
+import struct
 from subprocess import Popen, PIPE
 from datetime import datetime
-import time
-
 from ctypes import string_at # test
 from sys import getsizeof    # test
 from binascii import hexlify # test
-
-import struct
 from struct import *
 
 ## ORACLE CONNECTION ESTABLISHMENT
