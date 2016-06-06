@@ -21,9 +21,7 @@ from struct import *
 conn = cx_Oracle.Connection('/', mode = cx_Oracle.SYSDBA)
 cur = conn.cursor()
 
-
 ## SQL REQUESTS
-#c.execute(u'SELECT view_name FROM ALL_VIEWS')
 sqlKsuseAddr = "SELECT RAWTONHEX(min(addr)) FROM X$KSUSE"
 sqlSgaBase = "SELECT RAWTOHEX(addr) FROM sys.x$ksmmem WHERE rownum=1"
 sqlRowCount = "SELECT count(addr) FROM sys.x$ksuse"
@@ -35,14 +33,12 @@ sqlUsername = "select c.kqfconam field_name, c.kqfcooff offset, c.kqfcosiz sz fr
 sqlMachinename = "select c.kqfconam field_name, c.kqfcooff offset, c.kqfcosiz sz from x$kqfco c,x$kqfta t where t.indx = c.kqfcotab and t.kqftanam='X$KSUSE' and c.kqfconam='KSUSEMNM' order by offset"
 sqlStatusid = "select c.kqfconam field_name, c.kqfcooff offset, c.kqfcosiz sz from x$kqfco c,x$kqfta t where t.indx = c.kqfcotab and t.kqftanam='X$KSUSE' and c.kqfconam='KSUSEIDL' order by offset"
 sqlAllAddr = "SELECT RAWTONHEX(addr) FROM x$ksuse"
-
 sqlIndex = "select c.kqfconam field_name, c.kqfcooff offset, c.kqfcosiz sz from x$kqfco c,x$kqfta t where t.indx = c.kqfcotab and t.kqftanam='X$KSUSE' and c.kqfconam='INDX' order by offset"
 sqlSequence = "select c.kqfconam field_name, c.kqfcooff offset, c.kqfcosiz sz from x$kqfco c,x$kqfta t where t.indx = c.kqfcotab and t.kqftanam='X$KSUSE' and c.kqfconam='KSUSESEQ' order by offset"
 sqlEvent = "select c.kqfconam field_name, c.kqfcooff offset, c.kqfcosiz sz from x$kqfco c,x$kqfta t where t.indx = c.kqfcotab and t.kqftanam='X$KSUSE' and c.kqfconam='KSUSEOPC' order by offset"
 sqlP1 = "select c.kqfconam field_name, c.kqfcooff offset, c.kqfcosiz sz from x$kqfco c,x$kqfta t where t.indx = c.kqfcotab and t.kqftanam='X$KSUSE' and c.kqfconam='KSUSEP1' order by offset"
 sqlP2 = "select c.kqfconam field_name, c.kqfcooff offset, c.kqfcosiz sz from x$kqfco c,x$kqfta t where t.indx = c.kqfcotab and t.kqftanam='X$KSUSE' and c.kqfconam='KSUSEP2' order by offset"
 sqlP3 = "select c.kqfconam field_name, c.kqfcooff offset, c.kqfcosiz sz from x$kqfco c,x$kqfta t where t.indx = c.kqfcotab and t.kqftanam='X$KSUSE' and c.kqfconam='KSUSEP3' order by offset"
-
 
 ## OBTAINING DATA FROM DATABASE
 cur.execute(u'SELECT RAWTONHEX(min(addr)) FROM X$KSUSE')
@@ -144,13 +140,11 @@ stack = []
 for row in allAddrSQL:
   stack.append(int(row[0],16))
 
-
 cur.execute("select INDX, KSLEDNAM from X$KSLED")
 ksledTableSQL = cur.fetchall()
 tableKsled = dict([i for i in ksledTableSQL])
 
 conn.close()
-
 
 ## OBTAINING SHMID ID FROM SHARED MEMORY
 osRequest = "pmap `ps ax | grep [o]ra_pmon_${ORACLE_SID} | awk '{print $1}'` | grep shm | awk '{print $5,$1,$2}' | awk -F '=' '{print $2}'"
@@ -172,9 +166,6 @@ print "All Segments attached to Ora_mon as a tumple:", b
 ## Cycle to find in which segment containing our SHMID
 i=0
 while i < len(b) :
-#    print int(b[i+1],16)
-#    print ksuseAddrHEX
-#    print int(b[i+1],16)+int(b[i+2][0:len(b[i+2])-1],10)*1024
     if int(b[i+1],16)<int(ksuseAddrHEX,16)<int(b[i+1],16)+int(b[i+2][0:len(b[i+2])-1],10)*1024 :
 	  break
 #    print "--------------------------------------"
@@ -190,7 +181,6 @@ print "SHMID in DEC:", int(b[i],16)
 ksuseAddr = int(ksuseAddrHEX,16) # 0x9A034020 !CHANGES EACH TIME!
 rowCount  = int(rowCountDEC) # 247
 rowSize   = int(rowSizeDEC) # 12512
-
 
 ## READ SGA
 class SGAException(Exception):
